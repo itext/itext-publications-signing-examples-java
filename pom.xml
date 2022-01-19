@@ -88,10 +88,10 @@
 		<module>aws-kms</module>
 		<module>jce-utimaco</module>
 		<module>pkcs11-java11</module>
+		<module>pkcs11</module>
 	<!--
 		<module>itext7-kernel-fips</module>
 		<module>itext7-sign-fips</module>
-		<module>pkcs11-jdk8</module>
 		<module>simple</module>
 	  -->
 	</modules>
