@@ -81,7 +81,8 @@
 	<modules>
 		<module>aws-kms</module>
 		<module>jce-utimaco</module>
-		<module>pkcs11-java11</module>
+<!--		Commented because this code requires jdk11-->
+<!--		<module>pkcs11-java11</module>-->
 		<module>pkcs11</module>
 		<module>simple</module>
 	</modules>
