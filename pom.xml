@@ -10,7 +10,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<properties>
 		<bouncycastle.version>1.69</bouncycastle.version>
-		<itextpdf.version>7.2.1</itextpdf.version>
+		<itextpdf.version>7.2.4-SNAPSHOT</itextpdf.version>
 		<junit.jupiter.version>5.8.2</junit.jupiter.version>
 		<logback.version>1.2.11</logback.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
