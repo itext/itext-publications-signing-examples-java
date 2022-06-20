@@ -1,0 +1,8 @@
+/**
+ * <p>
+ * This package contains classes for signing PDFs with iText 7
+ * using a PKCS#11 device based on a Java 11 JRE with the
+ * <code>SunPKCS11</code> provider installed.
+ * </p>
+ */
+package com.itextpdf.signingexamples.pkcs11;
