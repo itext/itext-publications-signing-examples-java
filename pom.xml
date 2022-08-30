@@ -7,7 +7,7 @@
 	<artifactId>signing-examples-parent</artifactId>
 	<packaging>pom</packaging>
 	<name>Signing with iText v7</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>7.2.4-SNAPSHOT</version>
 	<properties>
 		<bouncycastle.version>1.69</bouncycastle.version>
 		<itextpdf.version>7.2.4-SNAPSHOT</itextpdf.version>
