@@ -58,7 +58,7 @@ class TestSignSimple {
     @Test
     void testSignSimpleUtimacoJceSignature() throws IOException, CryptoServerException, GeneralSecurityException {
         UtimacoJceSignature signature = new UtimacoJceSignature(new ByteArrayInputStream(CONFIG.getBytes()))
-                .select(null, "5678".toCharArray()).setDigestAlgorithmName("SHA256");
+                .select(null, "5678".toCharArray()).setHashAlgorithm("SHA256");
 
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
                 PdfReader pdfReader = new PdfReader(resource);

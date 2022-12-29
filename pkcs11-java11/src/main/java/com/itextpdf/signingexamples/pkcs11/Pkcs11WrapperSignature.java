@@ -21,8 +21,8 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @author mkl
  */
 public class Pkcs11WrapperSignature extends Pkcs11WrapperKeyAndCertificate implements IExternalSignature {
-    String signatureAlgorithmName;
-    String digestAlgorithmName;
+    String encryptionAlgorithm;
+    String hashAlgorithm;
 
     public Pkcs11WrapperSignature(String libraryPath, long slotId) throws IOException, TokenException {
         super(libraryPath, slotId);
@@ -31,39 +31,39 @@ public class Pkcs11WrapperSignature extends Pkcs11WrapperKeyAndCertificate imple
     public Pkcs11WrapperSignature select(String alias, String certLabel, char[] pin) throws TokenException, CertificateException {
         super.select(alias, certLabel, pin);
         if (Key.KeyType.RSA.equals(keyType)) {
-            signatureAlgorithmName = "RSA";
+            encryptionAlgorithm = "RSA";
         } else if (Key.KeyType.DSA.equals(keyType)) {
-            signatureAlgorithmName = "DSA";
+            encryptionAlgorithm = "DSA";
         } else if (Key.KeyType.ECDSA.equals(keyType)) {
-            signatureAlgorithmName = "ECDSA";
+            encryptionAlgorithm = "ECDSA";
         } else {
-            signatureAlgorithmName = null;
+            encryptionAlgorithm = null;
         }
 
         return this;
     }
 
     @Override
-    public String getSignatureAlgorithmName() {
-        return signatureAlgorithmName;
+    public String getEncryptionAlgorithm() {
+        return encryptionAlgorithm;
     }
 
     @Override
-    public String getDigestAlgorithmName() {
-        return digestAlgorithmName;
+    public String getHashAlgorithm() {
+        return hashAlgorithm;
     }
 
-    public Pkcs11WrapperSignature setDigestAlgorithmName(String digestAlgorithmName) {
-        this.digestAlgorithmName = DigestAlgorithms.getDigest(DigestAlgorithms.getAllowedDigest(digestAlgorithmName));
+    public Pkcs11WrapperSignature setHashAlgorithm(String hashAlgorithm) {
+        this.hashAlgorithm = DigestAlgorithms.getDigest(DigestAlgorithms.getAllowedDigest(hashAlgorithm));
         return this;
     }
 
     @Override
     public byte[] sign(byte[] message) throws GeneralSecurityException {
         long mechanismId;
-        switch(signatureAlgorithmName) {
+        switch(encryptionAlgorithm) {
         case "DSA":
-            switch(digestAlgorithmName) {
+            switch(hashAlgorithm) {
             case "SHA1":
                 mechanismId = PKCS11Constants.CKM_DSA_SHA1;
                 break;
@@ -80,10 +80,10 @@ public class Pkcs11WrapperSignature extends Pkcs11WrapperKeyAndCertificate imple
                 mechanismId = PKCS11Constants.CKM_DSA_SHA512;
                 break;
             default:
-                throw new InvalidAlgorithmParameterException("Not supported: " + digestAlgorithmName + "with" + signatureAlgorithmName);
+                throw new InvalidAlgorithmParameterException("Not supported: " + hashAlgorithm + "with" + encryptionAlgorithm);
             }
         case "ECDSA":
-            switch (digestAlgorithmName)
+            switch (hashAlgorithm)
             {
             case "SHA1":
                 mechanismId = PKCS11Constants.CKM_ECDSA_SHA1;
@@ -101,11 +101,11 @@ public class Pkcs11WrapperSignature extends Pkcs11WrapperKeyAndCertificate imple
                 mechanismId = PKCS11Constants.CKM_ECDSA_SHA512;
                 break;
             default:
-                throw new InvalidAlgorithmParameterException("Not supported: " + digestAlgorithmName + "with" + signatureAlgorithmName);
+                throw new InvalidAlgorithmParameterException("Not supported: " + hashAlgorithm + "with" + encryptionAlgorithm);
             }
             break;
         case "RSA":
-            switch (digestAlgorithmName)
+            switch (hashAlgorithm)
             {
             case "SHA1":
                 mechanismId = PKCS11Constants.CKM_SHA1_RSA_PKCS;
@@ -123,11 +123,11 @@ public class Pkcs11WrapperSignature extends Pkcs11WrapperKeyAndCertificate imple
                 mechanismId = PKCS11Constants.CKM_SHA512_RSA_PKCS;
                 break;
             default:
-                throw new InvalidAlgorithmParameterException("Not supported: " + digestAlgorithmName + "with" + signatureAlgorithmName);
+                throw new InvalidAlgorithmParameterException("Not supported: " + hashAlgorithm + "with" + encryptionAlgorithm);
             }
             break;
         default:
-            throw new InvalidAlgorithmParameterException("Not supported: " + digestAlgorithmName + "with" + signatureAlgorithmName);
+            throw new InvalidAlgorithmParameterException("Not supported: " + hashAlgorithm + "with" + encryptionAlgorithm);
 
         }
 

@@ -65,7 +65,7 @@ class TestSignSimpleWrapper {
                 PdfReader pdfReader = new PdfReader(resource);
                 OutputStream resultStream = new FileOutputStream(result)    ) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, resultStream, new StampingProperties().useAppendMode());
-            signature.select(null, certLabel, pin).setDigestAlgorithmName("SHA256");
+            signature.select(null, certLabel, pin).setHashAlgorithm("SHA256");
             IExternalDigest externalDigest = new BouncyCastleDigest();
             pdfSigner.signDetached(externalDigest , signature, signature.getChain(), null, null, tsaClient, 0, CryptoStandard.CMS);
         }

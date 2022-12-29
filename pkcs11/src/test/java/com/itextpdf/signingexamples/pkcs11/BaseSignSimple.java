@@ -40,7 +40,7 @@ public class BaseSignSimple {
 
     protected void testSignSimple() throws IOException, GeneralSecurityException {
         Pkcs11Signature signature = (config.startsWith("--") ? new Pkcs11Signature(config) : new Pkcs11Signature(new File(config)))
-                .select(alias, pin).setDigestAlgorithmName("SHA256");
+                .select(alias, pin).setHashAlgorithm("SHA256");
 
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
                 PdfReader pdfReader = new PdfReader(resource);

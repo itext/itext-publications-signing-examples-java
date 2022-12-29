@@ -66,7 +66,7 @@ class TestSignSimpleIaik {
         IAIKPkcs11 provider = new IAIKPkcs11(properties);
         Security.addProvider(provider);
 
-        Pkcs11Signature signature = new Pkcs11Signature(provider).select(alias, pin).setDigestAlgorithmName("SHA256");
+        Pkcs11Signature signature = new Pkcs11Signature(provider).select(alias, pin).setHashAlgorithm("SHA256");
 
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
                 PdfReader pdfReader = new PdfReader(resource);

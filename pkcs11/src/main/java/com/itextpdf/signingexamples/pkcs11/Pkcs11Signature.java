@@ -29,11 +29,11 @@ public class Pkcs11Signature implements IExternalSignature {
     /** The certificate chain. */
     Certificate[] chain;
 
-    /** The digest algorithm. */
-    String digestAlgorithmName;
+    /** The hash algorithm. */
+    String hashAlgorithm;
 
-    /** The signature algorithm (obtained from the private key). */
-    String signatureAlgorithmName;
+    /** The encryption algorithm (obtained from the private key). */
+    String encryptionAlgorithm;
 
     /** The security provider. */
     final Provider provider;
@@ -81,12 +81,12 @@ public class Pkcs11Signature implements IExternalSignature {
 
         if (found) {
             String algorithm = pk.getAlgorithm();
-            signatureAlgorithmName = "EC".equals(algorithm) ? "ECDSA" : algorithm;
+            encryptionAlgorithm = "EC".equals(algorithm) ? "ECDSA" : algorithm;
         } else {
             pk = null;
             chain = null;
             this.alias = null;
-            signatureAlgorithmName = null;
+            encryptionAlgorithm = null;
         }
 
         return this;
@@ -101,23 +101,23 @@ public class Pkcs11Signature implements IExternalSignature {
     }
 
     @Override
-    public String getSignatureAlgorithmName() {
-        return signatureAlgorithmName;
+    public String getEncryptionAlgorithm() {
+        return encryptionAlgorithm;
     }
 
     @Override
-    public String getDigestAlgorithmName() {
-        return digestAlgorithmName;
+    public String getHashAlgorithm() {
+        return hashAlgorithm;
     }
 
-    public Pkcs11Signature setDigestAlgorithmName(String digestAlgorithmName) {
-        this.digestAlgorithmName = DigestAlgorithms.getDigest(DigestAlgorithms.getAllowedDigest(digestAlgorithmName));
+    public Pkcs11Signature setHashAlgorithm(String hashAlgorithm) {
+        this.hashAlgorithm = DigestAlgorithms.getDigest(DigestAlgorithms.getAllowedDigest(hashAlgorithm));
         return this;
     }
 
     @Override
     public byte[] sign(byte[] message) throws GeneralSecurityException {
-        String algorithm = digestAlgorithmName + "with" + signatureAlgorithmName;
+        String algorithm = hashAlgorithm + "with" + encryptionAlgorithm;
         Signature sig = Signature.getInstance(algorithm, provider);
         sig.initSign(pk);
         sig.update(message);
