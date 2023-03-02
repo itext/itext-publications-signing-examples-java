@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 
 import com.itextpdf.signatures.IExternalSignature;
 
+import com.itextpdf.signatures.ISignatureMechanismParams;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.GetPublicKeyRequest;
@@ -75,6 +76,11 @@ public class AwsKmsSignature implements IExternalSignature {
         default:
             return null;
         }
+    }
+
+    @Override
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
     }
 
     @Override

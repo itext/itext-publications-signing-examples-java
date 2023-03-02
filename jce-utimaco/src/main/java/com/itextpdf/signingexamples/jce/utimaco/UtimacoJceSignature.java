@@ -13,6 +13,7 @@ import java.util.Enumeration;
 
 import com.itextpdf.signatures.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
+import com.itextpdf.signatures.ISignatureMechanismParams;
 
 import CryptoServerAPI.CryptoServerException;
 import CryptoServerJCE.CryptoServerProvider;
@@ -121,5 +122,9 @@ public class UtimacoJceSignature implements IExternalSignature {
         sig.initSign(pk);
         sig.update(message);
         return sig.sign();
+    }
+
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
     }
 }

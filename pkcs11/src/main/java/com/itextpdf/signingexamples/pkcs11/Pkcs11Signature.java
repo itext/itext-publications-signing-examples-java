@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import com.itextpdf.signatures.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
 
+import com.itextpdf.signatures.ISignatureMechanismParams;
 import sun.security.pkcs11.SunPKCS11;
 
 /**
@@ -103,6 +104,11 @@ public class Pkcs11Signature implements IExternalSignature {
     @Override
     public String getSignatureAlgorithmName() {
         return signatureAlgorithmName;
+    }
+
+    @Override
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
     }
 
     @Override
