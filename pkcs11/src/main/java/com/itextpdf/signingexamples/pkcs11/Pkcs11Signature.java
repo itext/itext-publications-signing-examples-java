@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import com.itextpdf.signatures.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
 
+import com.itextpdf.signatures.ISignatureMechanismParams;
 import sun.security.pkcs11.SunPKCS11;
 
 /**
@@ -29,11 +30,11 @@ public class Pkcs11Signature implements IExternalSignature {
     /** The certificate chain. */
     Certificate[] chain;
 
-    /** The hash algorithm. */
-    String hashAlgorithm;
+    /** The digest algorithm. */
+    String digestAlgorithmName;
 
-    /** The encryption algorithm (obtained from the private key). */
-    String encryptionAlgorithm;
+    /** The signature algorithm (obtained from the private key). */
+    String signatureAlgorithmName;
 
     /** The security provider. */
     final Provider provider;
@@ -81,12 +82,12 @@ public class Pkcs11Signature implements IExternalSignature {
 
         if (found) {
             String algorithm = pk.getAlgorithm();
-            encryptionAlgorithm = "EC".equals(algorithm) ? "ECDSA" : algorithm;
+            signatureAlgorithmName = "EC".equals(algorithm) ? "ECDSA" : algorithm;
         } else {
             pk = null;
             chain = null;
             this.alias = null;
-            encryptionAlgorithm = null;
+            signatureAlgorithmName = null;
         }
 
         return this;
@@ -101,23 +102,28 @@ public class Pkcs11Signature implements IExternalSignature {
     }
 
     @Override
-    public String getEncryptionAlgorithm() {
-        return encryptionAlgorithm;
+    public String getSignatureAlgorithmName() {
+        return signatureAlgorithmName;
     }
 
     @Override
-    public String getHashAlgorithm() {
-        return hashAlgorithm;
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
     }
 
-    public Pkcs11Signature setHashAlgorithm(String hashAlgorithm) {
-        this.hashAlgorithm = DigestAlgorithms.getDigest(DigestAlgorithms.getAllowedDigest(hashAlgorithm));
+    @Override
+    public String getDigestAlgorithmName() {
+        return digestAlgorithmName;
+    }
+
+    public Pkcs11Signature setDigestAlgorithmName(String digestAlgorithmName) {
+        this.digestAlgorithmName = DigestAlgorithms.getDigest(DigestAlgorithms.getAllowedDigest(digestAlgorithmName));
         return this;
     }
 
     @Override
     public byte[] sign(byte[] message) throws GeneralSecurityException {
-        String algorithm = hashAlgorithm + "with" + encryptionAlgorithm;
+        String algorithm = digestAlgorithmName + "with" + signatureAlgorithmName;
         Signature sig = Signature.getInstance(algorithm, provider);
         sig.initSign(pk);
         sig.update(message);

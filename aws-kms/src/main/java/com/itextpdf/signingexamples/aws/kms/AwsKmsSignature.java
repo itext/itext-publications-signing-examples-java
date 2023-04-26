@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 
 import com.itextpdf.signatures.IExternalSignature;
 
+import com.itextpdf.signatures.ISignatureMechanismParams;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.GetPublicKeyRequest;
@@ -45,7 +46,7 @@ public class AwsKmsSignature implements IExternalSignature {
     }
 
     @Override
-    public String getHashAlgorithm() {
+    public String getDigestAlgorithmName() {
         switch(signingAlgorithmSpec) {
         case ECDSA_SHA_256:
         case RSASSA_PKCS1_V1_5_SHA_256:
@@ -62,7 +63,7 @@ public class AwsKmsSignature implements IExternalSignature {
     }
 
     @Override
-    public String getEncryptionAlgorithm() {
+    public String getSignatureAlgorithmName() {
         switch(signingAlgorithmSpec) {
         case ECDSA_SHA_256:
         case ECDSA_SHA_384:
@@ -75,6 +76,11 @@ public class AwsKmsSignature implements IExternalSignature {
         default:
             return null;
         }
+    }
+
+    @Override
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
     }
 
     @Override
