@@ -30,8 +30,8 @@ import com.itextpdf.signatures.PrivateKeySignature;
 /**
  * <p>
  * This {@link IExternalSignatureContainer} implementation allows signing a PDF
- * with iText 7 using a JCA/JCE private key and X509 certificate. In contrast to
- * the {@link PrivateKeySignature} already included in iText 7 this class also
+ * with iText using a JCA/JCE private key and X509 certificate. In contrast to
+ * the {@link PrivateKeySignature} already included in iText this class also
  * generates the CMS container to be embedded in the PDF. Thus, it in particular
  * is not restricted by the limitations of the CMS container generation code
  * used by iText itself.

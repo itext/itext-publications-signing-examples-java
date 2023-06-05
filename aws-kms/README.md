@@ -1,4 +1,4 @@
-**This project contains the example code for the article [Digitally sign a PDF using AWS KMS and iText 7](https://itextpdf.com/de/node/14831).**
+**This project contains the example code for the article [Digitally sign a PDF using AWS KMS and iText](https://itextpdf.com/de/node/14831).**
 
 # AWS KMS Test Profile
 

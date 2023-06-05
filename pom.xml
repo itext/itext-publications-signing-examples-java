@@ -4,7 +4,7 @@
 	<groupId>com.itextpdf.signingexamples</groupId>
 	<artifactId>signing-examples-parent</artifactId>
 	<packaging>pom</packaging>
-	<name>Signing with iText v7</name>
+	<name>Signing with iText</name>
 	<version>8.0.1-SNAPSHOT</version>
 	<properties>
 		<bouncycastle.version>1.69</bouncycastle.version>
