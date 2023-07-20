@@ -1,6 +1,6 @@
 /**
  * <p>
- * This package contains classes for signing PDFs with iText 7
+ * This package contains classes for signing PDFs with iText
  * using an Utimaco HSM with the Utimaco <code>CryptoServerJCE</code>
  * provider installed.
  * </p>
