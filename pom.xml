@@ -24,6 +24,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.itextpdf</groupId>
+				<artifactId>bouncy-castle-adapter</artifactId>
+				<version>${itextpdf.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.itextpdf</groupId>
 				<artifactId>forms</artifactId>
 				<version>${itextpdf.version}</version>
 			</dependency>
