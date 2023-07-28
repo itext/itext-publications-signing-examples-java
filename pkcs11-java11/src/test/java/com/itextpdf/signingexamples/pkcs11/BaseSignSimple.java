@@ -56,6 +56,21 @@ public class BaseSignSimple {
         }
     }
 
+    protected void testSignSimpleWithPss() throws IOException, GeneralSecurityException {
+        Pkcs11Signature signature = (config.startsWith("--") ? new Pkcs11Signature(config) : new Pkcs11Signature(new File(config)))
+                .select(alias, pin).setDigestAlgorithmName("SHA256")
+                .with("SHA256withRSASSA-PSS", new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1));
+
+        try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream resultStream = new FileOutputStream(result)    ) {
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, resultStream, new StampingProperties().useAppendMode());
+
+            IExternalDigest externalDigest = new BouncyCastleDigest();
+            pdfSigner.signDetached(externalDigest , signature, signature.getChain(), null, ocspClient, tsaClient, 0, CryptoStandard.CMS);
+        }
+    }
+
     protected void testSignSimpleContainer() throws IOException, GeneralSecurityException {
         Pkcs11SignatureContainer signature = (config.startsWith("--") ? new Pkcs11SignatureContainer(config, PdfName.Adbe_pkcs7_detached) : new Pkcs11SignatureContainer(new File(config), PdfName.Adbe_pkcs7_detached))
                 .select(alias, pin).with("SHA256withRSASSA-PSS", new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1));
