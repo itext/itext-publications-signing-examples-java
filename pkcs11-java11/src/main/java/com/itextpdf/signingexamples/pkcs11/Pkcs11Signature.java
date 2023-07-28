@@ -14,6 +14,8 @@ import java.util.Enumeration;
 import com.itextpdf.signatures.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
 
+import com.itextpdf.signatures.ISignatureMechanismParams;
+
 /**
  * @author mkl
  */
@@ -30,10 +32,10 @@ public class Pkcs11Signature implements IExternalSignature {
     /** The digest algorithm. */
     String digestAlgorithmName;
 
-    /** The signature algorithm (obtained from the private key) */
+    /** The signature algorithm (obtained from the private key). */
     String signatureAlgorithmName;
 
-    /** The security provider */
+    /** The security provider. */
     final Provider provider;
 
     public Pkcs11Signature(File pkcs11configFile) {
@@ -106,7 +108,12 @@ public class Pkcs11Signature implements IExternalSignature {
     }
 
     @Override
-    public String setDigestAlgorithmName() {
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
+    }
+
+    @Override
+    public String getDigestAlgorithmName() {
         return digestAlgorithmName;
     }
 
