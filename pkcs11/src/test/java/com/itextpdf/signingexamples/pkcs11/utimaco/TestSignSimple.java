@@ -30,8 +30,24 @@ class TestSignSimple extends BaseSignSimple {
                 + "library = c:/Program Files/Utimaco/CryptoServer/Lib/cs_pkcs11_R2.dll\n"
                 + "slot = 0\n";
         alias = null;
-        pin = "5678".toCharArray();
+        pin = "123456".toCharArray();
         result = new File(RESULT_FOLDER, "circles-pkcs11-signed-simple-utimaco.pdf");
         testSignSimple();
+    }
+
+    // Beware, you may be subject of https://bugs.openjdk.org/browse/JDK-8232950 and
+    // get an InvalidKeyException: "RSA key must be at least 512 bytes".
+    // The fix of that bug has been backported to Oracle Java 1.8 in u391, see JDK-8310185.
+    // In OpenJdk 8, on the other hand, it already has been backported in u352, see JDK-8292875.
+    // In Amazon Corretto 1.8 u382, for example, tests show that the bug does not occur anymore.
+    @Test
+    void testWithPss() throws IOException, GeneralSecurityException {
+        config = "--name = Utimaco\n"
+                + "library = \"c:/Program Files/Utimaco/CryptoServer/Lib/cs_pkcs11_R2.dll\"\n"
+                + "slot = 0\n";
+        alias = null;
+        pin = "123456".toCharArray();
+        result = new File(RESULT_FOLDER, "circles-pkcs11-signed-simple-utimaco-pss.pdf");
+        testSignSimpleWithPss();
     }
 }

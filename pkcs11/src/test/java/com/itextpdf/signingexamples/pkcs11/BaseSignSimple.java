@@ -7,14 +7,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.Security;
+import java.security.spec.MGF1ParameterSpec;
+import java.security.spec.PSSParameterSpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
 
+import com.itextpdf.kernel.pdf.PdfName;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.StampingProperties;
 import com.itextpdf.signatures.BouncyCastleDigest;
 import com.itextpdf.signatures.IExternalDigest;
+import com.itextpdf.signatures.IOcspClient;
 import com.itextpdf.signatures.ITSAClient;
 import com.itextpdf.signatures.PdfSigner;
 import com.itextpdf.signatures.PdfSigner.CryptoStandard;
@@ -48,7 +52,22 @@ public class BaseSignSimple {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, resultStream, new StampingProperties().useAppendMode());
 
             IExternalDigest externalDigest = new BouncyCastleDigest();
-            pdfSigner.signDetached(externalDigest , signature, signature.getChain(), null, null, tsaClient, 0, CryptoStandard.CMS);
+            pdfSigner.signDetached(externalDigest , signature, signature.getChain(), null, ocspClient, tsaClient, 0, CryptoStandard.CMS);
+        }
+    }
+
+    protected void testSignSimpleWithPss() throws IOException, GeneralSecurityException {
+        Pkcs11Signature signature = (config.startsWith("--") ? new Pkcs11Signature(config) : new Pkcs11Signature(new File(config)))
+                .select(alias, pin).setDigestAlgorithmName("SHA256")
+                .with("SHA256withRSASSA-PSS", new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1));
+
+        try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream resultStream = new FileOutputStream(result)    ) {
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, resultStream, new StampingProperties().useAppendMode());
+
+            IExternalDigest externalDigest = new BouncyCastleDigest();
+            pdfSigner.signDetached(externalDigest , signature, signature.getChain(), null, ocspClient, tsaClient, 0, CryptoStandard.CMS);
         }
     }
 
@@ -57,5 +76,6 @@ public class BaseSignSimple {
     protected char[] pin;
     protected File result;
 
+    protected IOcspClient ocspClient = null;
     protected ITSAClient tsaClient = null;
 }
