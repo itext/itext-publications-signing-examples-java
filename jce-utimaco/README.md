@@ -29,6 +29,6 @@ A RSA keypair and a self-signed certificate then have been generated in that gro
     keytool.exe -providerpath lib\CryptoServerJCE.jar -providerclass CryptoServerJCE.CryptoServerProvider
                 -providername CryptoServer -keystore NONE -storetype CryptoServer
                 -genkeypair -alias RSAkey -keyalg RSA
-                -dname "CN=mkl PKCS11 test, OU=tests, O=mkl"
+                -dname "CN=mkl JCE test, OU=tests, O=mkl"
 
 The same password has been used for the new key as for the keystore, i.e. the password of the implied user `JCE`: `5678`.
