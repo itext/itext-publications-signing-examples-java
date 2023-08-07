@@ -55,7 +55,8 @@ class TestSignSimple {
 
     /**
      * Test using the custom {@link UtimacoJceSignature} implementation
-     * of {@link IExternalSignature}.
+     * of {@link IExternalSignature} to create a RSA signature with PKCS#1 v1.5
+     * padding.
      */
     @Test
     void testSignSimpleUtimacoJceSignature() throws IOException, CryptoServerException, GeneralSecurityException {
@@ -65,6 +66,27 @@ class TestSignSimple {
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
                 PdfReader pdfReader = new PdfReader(resource);
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "circles-utimaco-signed-simple-specific.pdf"))) {
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
+
+            IExternalDigest externalDigest = new BouncyCastleDigest();
+            pdfSigner.signDetached(externalDigest, signature, signature.getChain(), null, null, null, 0, CryptoStandard.CMS);
+        }
+    }
+
+    /**
+     * Test using the custom {@link UtimacoJceSignature} implementation
+     * of {@link IExternalSignature} to create a RSA signature with PKCS#1 v1.5
+     * padding.
+     */
+    @Test
+    void testSignSimpleUtimacoJceSignaturePss() throws IOException, CryptoServerException, GeneralSecurityException {
+        UtimacoJceSignature signature = new UtimacoJceSignature(new ByteArrayInputStream(CONFIG.getBytes()))
+                .select(null, "5678".toCharArray()).setDigestAlgorithmName("SHA256")
+                .with(new PSSParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, 32, 1));;
+
+        try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "circles-utimaco-signed-simple-specific-pss.pdf"))) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
 
             IExternalDigest externalDigest = new BouncyCastleDigest();
