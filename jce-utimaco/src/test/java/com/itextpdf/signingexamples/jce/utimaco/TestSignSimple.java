@@ -10,6 +10,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
+import java.security.Signature;
 import java.security.cert.Certificate;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
@@ -29,6 +30,7 @@ import com.itextpdf.signatures.IExternalSignature;
 import com.itextpdf.signatures.PdfSigner;
 import com.itextpdf.signatures.PdfSigner.CryptoStandard;
 import com.itextpdf.signatures.PrivateKeySignature;
+import com.itextpdf.signatures.RSASSAPSSMechanismParams;
 
 import CryptoServerAPI.CryptoServerException;
 import CryptoServerJCE.CryptoServerProvider;
@@ -72,7 +74,8 @@ class TestSignSimple {
 
     /**
      * Test using the iText {@link PrivateKeySignature} implementation
-     * of {@link IExternalSignature}.
+     * of {@link IExternalSignature} to create a RSA signature with PKCS#1 v1.5
+     * padding.
      */
     @Test
     void testSignSimpleGeneric() throws NumberFormatException, IOException, CryptoServerException, GeneralSecurityException {
@@ -96,6 +99,67 @@ class TestSignSimple {
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
                 PdfReader pdfReader = new PdfReader(resource);
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "circles-utimaco-signed-simple-generic.pdf"))) {
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
+
+            IExternalDigest externalDigest = new BouncyCastleDigest();
+            pdfSigner.signDetached(externalDigest, signature, chain, null, null, null, 0, CryptoStandard.CMS);
+        }
+    }
+
+    /**
+     * <p>
+     * Test using the iText {@link PrivateKeySignature} implementation
+     * of {@link IExternalSignature} to create a RSASSA-PSS signature.
+     * </p><p>
+     * This code overrides {@link PrivateKeySignature#sign(byte[])} for two work-arounds.
+     * </p><p>
+     * On one hand the Utimaco JCE CryptoServer provider expects RSASSA-PSS signatures to
+     * be created using "SHAXXXwithRSA" as algorithm name, recognizing the PSS nature by
+     * the set parameters. It does reject "SHAXXXwithRSASSA-PSS" and similar names showing
+     * the PSS nature already in the signature algorithm name. iText only tries algorithm
+     * names mentioning PSS.
+     * </p><p>
+     * On the other hand it expects the hash algorithm in the {@link PSSParameterSpec} (the
+     * first constructor parameter) to be written in a form with a dash, e.g. "SHA-256".
+     * iText normalizes to the Java default without a dash, e.g. "SHA256".
+     * </p>
+     */
+    @Test
+    void testSignSimpleGenericPss() throws NumberFormatException, IOException, CryptoServerException, GeneralSecurityException {
+        char[] pin = "5678".toCharArray();
+        CryptoServerProvider provider = new CryptoServerProvider(new ByteArrayInputStream(CONFIG.getBytes()));
+        Security.removeProvider(provider.getName());
+        Security.addProvider(provider);
+
+        KeyStore ks = KeyStore.getInstance("CryptoServer", provider);
+        ks.load(null, pin);
+
+        Enumeration<String> aliases = ks.aliases();
+        Assertions.assertTrue(aliases.hasMoreElements(), "No alias in CryptoServerProvider key store");
+        String alias = aliases.nextElement();
+        PrivateKey pk = (PrivateKey) ks.getKey(alias, pin);
+        Assertions.assertNotNull(pk, "No key for alias");
+        Certificate[] chain = ks.getCertificateChain(alias);
+        Assertions.assertNotNull(chain, "No chain for alias");
+
+        String digestName = "SHA-256";
+        IExternalSignature signature = new PrivateKeySignature(pk, digestName, "RSASSA-PSS", provider.getName(), RSASSAPSSMechanismParams.createForDigestAlgorithm(digestName)) {
+            @Override
+            public byte[] sign(byte[] message) throws GeneralSecurityException {
+                Signature sig = Signature.getInstance("SHA256withRSA", provider);
+
+                MGF1ParameterSpec mgf1Spec = new MGF1ParameterSpec(digestName);
+                PSSParameterSpec spec = new PSSParameterSpec(digestName, "MGF1", mgf1Spec, 32, RSASSAPSSMechanismParams.DEFAULT_TRAILER_FIELD);
+                sig.setParameter(spec);
+
+                sig.initSign(pk);
+                sig.update(message);
+                return sig.sign();
+            }
+        };
+        try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "circles-utimaco-signed-simple-generic-pss.pdf"))) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
 
             IExternalDigest externalDigest = new BouncyCastleDigest();
