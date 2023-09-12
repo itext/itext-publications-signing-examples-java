@@ -1,10 +1,14 @@
 package com.itextpdf.signingexamples.aws.kms;
 
 import java.security.GeneralSecurityException;
+import java.util.List;
+import java.util.function.Function;
 
 import com.itextpdf.signatures.IExternalSignature;
 
 import com.itextpdf.signatures.ISignatureMechanismParams;
+import com.itextpdf.signatures.RSASSAPSSMechanismParams;
+
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.kms.KmsClient;
 import software.amazon.awssdk.services.kms.model.GetPublicKeyRequest;
@@ -19,6 +23,10 @@ import software.amazon.awssdk.services.kms.model.SigningAlgorithmSpec;
  */
 public class AwsKmsSignature implements IExternalSignature {
     public AwsKmsSignature(String keyId) {
+        this(keyId, a -> a != null && a.size() > 0 ? a.get(0) : null);
+    }
+
+    public AwsKmsSignature(String keyId, Function<List<SigningAlgorithmSpec>, SigningAlgorithmSpec> selector) {
         this.keyId = keyId;
 
         try (   KmsClient kmsClient = KmsClient.create() ) {
@@ -26,7 +34,7 @@ public class AwsKmsSignature implements IExternalSignature {
                     .keyId(keyId)
                     .build();
             GetPublicKeyResponse getPublicKeyResponse = kmsClient.getPublicKey(getPublicKeyRequest);
-            signingAlgorithmSpec = getPublicKeyResponse.signingAlgorithms().get(0);
+            signingAlgorithmSpec = selector.apply(getPublicKeyResponse.signingAlgorithms());
             switch(signingAlgorithmSpec) {
             case ECDSA_SHA_256:
             case ECDSA_SHA_384:
@@ -34,11 +42,10 @@ public class AwsKmsSignature implements IExternalSignature {
             case RSASSA_PKCS1_V1_5_SHA_256:
             case RSASSA_PKCS1_V1_5_SHA_384:
             case RSASSA_PKCS1_V1_5_SHA_512:
-                break;
             case RSASSA_PSS_SHA_256:
             case RSASSA_PSS_SHA_384:
             case RSASSA_PSS_SHA_512:
-                throw new IllegalArgumentException(String.format("Signing algorithm %s not supported directly by iText", signingAlgorithmSpec));
+                break;
             default:
                 throw new IllegalArgumentException(String.format("Unknown signing algorithm: %s", signingAlgorithmSpec));
             }
@@ -50,12 +57,15 @@ public class AwsKmsSignature implements IExternalSignature {
         switch(signingAlgorithmSpec) {
         case ECDSA_SHA_256:
         case RSASSA_PKCS1_V1_5_SHA_256:
+        case RSASSA_PSS_SHA_256:
             return "SHA-256";
         case ECDSA_SHA_384:
         case RSASSA_PKCS1_V1_5_SHA_384:
+        case RSASSA_PSS_SHA_384:
             return "SHA-384";
         case ECDSA_SHA_512:
         case RSASSA_PKCS1_V1_5_SHA_512:
+        case RSASSA_PSS_SHA_512:
             return "SHA-512";
         default:
             return null;
@@ -73,6 +83,10 @@ public class AwsKmsSignature implements IExternalSignature {
         case RSASSA_PKCS1_V1_5_SHA_384:
         case RSASSA_PKCS1_V1_5_SHA_512:
             return "RSA";
+        case RSASSA_PSS_SHA_256:
+        case RSASSA_PSS_SHA_384:
+        case RSASSA_PSS_SHA_512:
+            return "RSASSA-PSS";
         default:
             return null;
         }
@@ -80,7 +94,23 @@ public class AwsKmsSignature implements IExternalSignature {
 
     @Override
     public ISignatureMechanismParams getSignatureMechanismParameters() {
-        return null;
+        switch (signingAlgorithmSpec)
+        {
+            case RSASSA_PSS_SHA_256:
+                return RSASSAPSSMechanismParams.createForDigestAlgorithm("SHA-256");
+            case RSASSA_PSS_SHA_384:
+                return RSASSAPSSMechanismParams.createForDigestAlgorithm("SHA-384");
+            case RSASSA_PSS_SHA_512:
+                return RSASSAPSSMechanismParams.createForDigestAlgorithm("SHA-512");
+            case ECDSA_SHA_256:
+            case ECDSA_SHA_384:
+            case ECDSA_SHA_512:
+            case RSASSA_PKCS1_V1_5_SHA_256:
+            case RSASSA_PKCS1_V1_5_SHA_384:
+            case RSASSA_PKCS1_V1_5_SHA_512:
+            default:
+                return null;
+        }
     }
 
     @Override
