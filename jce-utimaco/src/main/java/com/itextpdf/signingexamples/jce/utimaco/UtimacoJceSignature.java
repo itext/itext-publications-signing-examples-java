@@ -9,11 +9,17 @@ import java.security.PrivateKey;
 import java.security.Security;
 import java.security.Signature;
 import java.security.cert.Certificate;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.PSSParameterSpec;
 import java.util.Enumeration;
 
+import com.itextpdf.bouncycastleconnector.BouncyCastleFactoryCreator;
+import com.itextpdf.commons.bouncycastle.IBouncyCastleFactory;
+import com.itextpdf.commons.bouncycastle.asn1.IASN1ObjectIdentifier;
 import com.itextpdf.signatures.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
 import com.itextpdf.signatures.ISignatureMechanismParams;
+import com.itextpdf.signatures.RSASSAPSSMechanismParams;
 
 import CryptoServerAPI.CryptoServerException;
 import CryptoServerJCE.CryptoServerProvider;
@@ -36,6 +42,9 @@ public class UtimacoJceSignature implements IExternalSignature {
 
     /** The signature algorithm (obtained from the private key) */
     String signatureAlgorithmName;
+
+    /** The parameters of the fill, explicitly given signature algorithm. */
+    AlgorithmParameterSpec fullSignatureAlgorithmParamSpec;
 
     /** The security provider */
     final CryptoServerProvider provider;
@@ -92,6 +101,11 @@ public class UtimacoJceSignature implements IExternalSignature {
         return this;
     }
 
+    public UtimacoJceSignature with(AlgorithmParameterSpec paramSpec) {
+        this.fullSignatureAlgorithmParamSpec = paramSpec;
+        return this;
+    }
+
     public String getAlias() {
         return alias;
     }
@@ -102,6 +116,8 @@ public class UtimacoJceSignature implements IExternalSignature {
 
     @Override
     public String getSignatureAlgorithmName() {
+        if ("RSA".equals(signatureAlgorithmName) && (fullSignatureAlgorithmParamSpec instanceof PSSParameterSpec))
+            return "RSASSA-PSS";
         return signatureAlgorithmName;
     }
 
@@ -117,14 +133,25 @@ public class UtimacoJceSignature implements IExternalSignature {
 
     @Override
     public byte[] sign(byte[] message) throws GeneralSecurityException {
-        String algorithm = digestAlgorithmName + "with" + signatureAlgorithmName;
+        String algorithm = digestAlgorithmName + "with" + signatureAlgorithmName; // explicitly don't add "SSA-PSS" or "andMGF1"
         Signature sig = Signature.getInstance(algorithm, provider);
         sig.initSign(pk);
+        if (fullSignatureAlgorithmParamSpec != null)
+            sig.setParameter(fullSignatureAlgorithmParamSpec);
         sig.update(message);
         return sig.sign();
     }
 
     public ISignatureMechanismParams getSignatureMechanismParameters() {
+        if (fullSignatureAlgorithmParamSpec instanceof PSSParameterSpec) {
+            IBouncyCastleFactory factory = BouncyCastleFactoryCreator.getFactory();
+            PSSParameterSpec pssSpec = (PSSParameterSpec) fullSignatureAlgorithmParamSpec;
+
+            String oid = DigestAlgorithms.getAllowedDigest(digestAlgorithmName);
+            IASN1ObjectIdentifier oidWrapper = factory.createASN1ObjectIdentifier(oid);
+
+            return new RSASSAPSSMechanismParams(oidWrapper, pssSpec.getSaltLength(), pssSpec.getTrailerField());
+        }
         return null;
     }
 }

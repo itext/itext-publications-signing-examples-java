@@ -13,6 +13,8 @@ import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
+import com.itextpdf.signatures.ISignatureMechanismParams;
+
 /**
  * This {@link IExternalSignature} implementation is based on the
  * <a href="https://jce.iaik.tugraz.at/products/core-crypto-toolkits/pkcs11-wrapper/">
@@ -46,6 +48,11 @@ public class Pkcs11WrapperSignature extends Pkcs11WrapperKeyAndCertificate imple
     @Override
     public String getSignatureAlgorithmName() {
         return signatureAlgorithmName;
+    }
+
+    @Override
+    public ISignatureMechanismParams getSignatureMechanismParameters() {
+        return null;
     }
 
     @Override

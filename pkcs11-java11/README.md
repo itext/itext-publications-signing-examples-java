@@ -122,3 +122,11 @@ Once you have retrieved copies of those artifacts, you can deploy them locally l
 # Selecting a PKCS#11 Device
 
 The PKCS#11 device used by a generic test can be controlled via an environment variable, <tt>PKCS11_CONFIG</tt> which can either be set to the path and name of a PKCS#11 configuration file or one of the fixed values <tt>SOFTHSM</tt> and <tt>UTIMACO</tt>. An alias (if required) can be selected in the environment variable <tt>PKCS11_ALIAS</tt>. The PIN used for signing can be selected using the environment variable <tt>PKCS11_PIN</tt> and defaults to <tt>5678</tt>.
+
+# Known restrictions
+
+## Sun PKCS#11 provider and RSASSA-PSS
+
+The PKCS#11 drivers that support RSASSA-PSS do so in different ways, they require different signing algorithm mechanism and parameters combinations. Unfortunately the Sun PKCS#11 provider seems to have been developed with only some such combinations in mind and explicitly uses `assert` to check the combination. Except for those assertions, it can also handle other combinations. In newer Java versions this meanwhile has been fixed. See for example https://bugs.openjdk.org/browse/JDK-8278120
+
+So if you run into an `AssertionError` when running RSASSA-PSS tests via PKCS#11, disable assertions for the test calls or update to a current Java version.
