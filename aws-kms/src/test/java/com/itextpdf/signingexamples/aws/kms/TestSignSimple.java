@@ -49,7 +49,7 @@ class TestSignSimple {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
 
             IExternalDigest externalDigest = new BouncyCastleDigest();
-            pdfSigner.signDetached(externalDigest , signature, new Certificate[] {certificate}, null, null, null, 0, CryptoStandard.CMS);
+            pdfSigner.signDetached(externalDigest, signature, new Certificate[] {certificate}, null, null, null, 0, CryptoStandard.CMS);
         }
     }
 
@@ -65,22 +65,23 @@ class TestSignSimple {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
 
             IExternalDigest externalDigest = new BouncyCastleDigest();
-            pdfSigner.signDetached(externalDigest , signature, new Certificate[] {certificate}, null, null, null, 0, CryptoStandard.CMS);
+            pdfSigner.signDetached(externalDigest, signature, new Certificate[] {certificate}, null, null, null, 0, CryptoStandard.CMS);
         }
     }
 
     @Test
     void testSignSimpleRsaSsaPss() throws IOException, GeneralSecurityException {
         String keyId = "alias/SigningExamples-RSA_2048";
-        X509Certificate certificate = CertificateUtils.generateSelfSignedCertificate(keyId, "CN=AWS KMS PDF Signing Test,OU=mkl tests,O=mkl", TestSignSimple::selectRsaSsaPss);
-        AwsKmsSignatureContainer signatureContainer = new AwsKmsSignatureContainer(certificate, keyId, TestSignSimple::selectRsaSsaPss);
+        AwsKmsSignature signature = new AwsKmsSignature(keyId, TestSignSimple::selectRsaSsaPss);
+        Certificate certificate = CertificateUtils.generateSelfSignedCertificate(keyId, "CN=AWS KMS PDF Signing Test,OU=mkl tests,O=mkl");
 
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
                 PdfReader pdfReader = new PdfReader(resource);
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "circles-aws-kms-signed-simple-RSASSA_PSS.pdf"))) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
 
-            pdfSigner.signExternalContainer(signatureContainer, 8192);
+            IExternalDigest externalDigest = new BouncyCastleDigest();
+            pdfSigner.signDetached(externalDigest, signature, new Certificate[] {certificate}, null, null, null, 0, CryptoStandard.CMS);
         }
     }
 
@@ -89,6 +90,21 @@ class TestSignSimple {
             return specs.stream().filter(spec -> spec.toString().startsWith("RSASSA_PSS")).findFirst().orElse(null);
         else
             return null;
+    }
+
+    @Test
+    void testSignSimpleRsaSsaPssExternal() throws IOException, GeneralSecurityException {
+        String keyId = "alias/SigningExamples-RSA_2048";
+        X509Certificate certificate = CertificateUtils.generateSelfSignedCertificate(keyId, "CN=AWS KMS PDF Signing Test,OU=mkl tests,O=mkl", TestSignSimple::selectRsaSsaPss);
+        AwsKmsSignatureContainer signatureContainer = new AwsKmsSignatureContainer(certificate, keyId, TestSignSimple::selectRsaSsaPss);
+
+        try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "circles-aws-kms-signed-simple-RSASSA_PSS-External.pdf"))) {
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties().useAppendMode());
+
+            pdfSigner.signExternalContainer(signatureContainer, 8192);
+        }
     }
 
     @Test
