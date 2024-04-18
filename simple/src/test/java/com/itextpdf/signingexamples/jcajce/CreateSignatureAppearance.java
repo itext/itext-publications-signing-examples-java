@@ -14,12 +14,15 @@ import java.security.cert.Certificate;
 import java.util.Enumeration;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.itextpdf.forms.PdfAcroForm;
 import com.itextpdf.forms.fields.PdfSignatureFormField;
 import com.itextpdf.forms.fields.SignatureFormFieldBuilder;
+import com.itextpdf.forms.fields.properties.SignedAppearanceText;
+import com.itextpdf.forms.form.element.SignatureFieldAppearance;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -39,10 +42,15 @@ import com.itextpdf.kernel.pdf.annot.PdfWidgetAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
+import com.itextpdf.kernel.pdf.xobject.PdfImageXObject;
+import com.itextpdf.layout.element.Div;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.BackgroundImage;
+import com.itextpdf.layout.properties.BackgroundSize;
 import com.itextpdf.signatures.BouncyCastleDigest;
 import com.itextpdf.signatures.IExternalSignature;
 import com.itextpdf.signatures.PdfSignatureAppearance;
-import com.itextpdf.signatures.PdfSignatureAppearance.RenderingMode;
 import com.itextpdf.signatures.PdfSigner;
 import com.itextpdf.signatures.PdfSigner.CryptoStandard;
 import com.itextpdf.signatures.PrivateKeySignature;
@@ -82,12 +90,11 @@ class CreateSignatureAppearance {
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-DESCRIPTION.pdf")) ) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.DESCRIPTION);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -104,13 +111,15 @@ class CreateSignatureAppearance {
 
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.GRAPHIC);
-            appearance.setSignatureGraphic(data);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent(data);
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -127,13 +136,15 @@ class CreateSignatureAppearance {
 
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.GRAPHIC_AND_DESCRIPTION);
-            appearance.setSignatureGraphic(data);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent(new SignedAppearanceText(), data); // SignedAppearanceText will be filled in automatically
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -147,13 +158,15 @@ class CreateSignatureAppearance {
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-NAME_AND_DESCRIPTION.pdf")) ) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.NAME_AND_DESCRIPTION);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
-            appearance.setCertificate(chain[0]);
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -169,12 +182,13 @@ class CreateSignatureAppearance {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
             pdfSigner.setFieldName("Signature");
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setRenderingMode(RenderingMode.NAME_AND_DESCRIPTION);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
-            appearance.setCertificate(chain[0]);
-            appearance.setReuseAppearance(true);
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+            pdfSigner.getSignatureField().setReuseAppearance(true);
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -216,15 +230,21 @@ class CreateSignatureAppearance {
             ImageData data = ImageDataFactory.create(StreamUtil.inputStreamToArray(imageResource));
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.NAME_AND_DESCRIPTION);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
-            appearance.setCertificate(chain[0]);
-            appearance.setImage(data);
-            appearance.setImageScale(-1);
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
+            BackgroundSize size = new BackgroundSize();
+            size.setBackgroundSizeToContain();
+            appearance.setBackgroundImage(new BackgroundImage.Builder()
+                    .setImage(new PdfImageXObject(data))
+                    .setBackgroundSize(size)
+                    .build());
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -238,14 +258,17 @@ class CreateSignatureAppearance {
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-setCaptions.pdf")) ) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.DESCRIPTION);
-            appearance.setReasonCaption("Objective: ");
-            appearance.setReason("Specimen");
-            appearance.setLocationCaption("Whereabouts: ");
-            appearance.setLocation("Boston");
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignedAppearanceText appearanceText = new SignedAppearanceText();
+            appearanceText.setReasonLine("Objective: " + pdfSigner.getReason());
+            appearanceText.setLocationLine("Whereabouts: " + pdfSigner.getLocation());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent(appearanceText);
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -259,16 +282,18 @@ class CreateSignatureAppearance {
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-SetFontStyle.pdf")) ) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.NAME_AND_DESCRIPTION);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
-            appearance.setCertificate(chain[0]);
-            appearance.setLayer2Font(PdfFontFactory.createFont(StandardFonts.COURIER));
-            appearance.setLayer2FontColor(new DeviceRgb(0xF9, 0x9D, 0x25));
-            appearance.setLayer2FontSize(10);
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
+            appearance.setFont(PdfFontFactory.createFont(StandardFonts.COURIER));
+            appearance.setFontColor(new DeviceRgb(0xF9, 0x9D, 0x25));
+            appearance.setFontSize(10);
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -285,14 +310,15 @@ class CreateSignatureAppearance {
 
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.GRAPHIC_AND_DESCRIPTION);
-            appearance.setSignatureGraphic(data);
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
             String restriction = "The qualified electronic signature at hand is restricted to present offers, invoices or credit notes to customers according to EU REGULATION No 910/2014 (23 July 2014) and German VAT law (§14 UStG).";
-            appearance.setReason(restriction);
-            appearance.setLayer2Text(restriction);
+            pdfSigner.setReason(restriction);
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent(restriction, data);
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -309,21 +335,24 @@ class CreateSignatureAppearance {
 
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
-            appearance.setRenderingMode(RenderingMode.GRAPHIC_AND_DESCRIPTION);
-            appearance.setSignatureGraphic(data);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
+            Rectangle rectangle = new Rectangle(100, 500, 300, 100);
+            pdfSigner.setPageRect(rectangle);
+            pdfSigner.setPageNumber(1);
 
-            PdfFormXObject layer0 = appearance.getLayer0();
-            Rectangle rectangle = layer0.getBBox().toRectangle();
-            PdfCanvas canvas = new PdfCanvas(layer0, pdfSigner.getDocument());
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent(new SignedAppearanceText(), data); // SignedAppearanceText will be filled in automatically
+            pdfSigner.setSignatureAppearance(appearance);
+
+            PdfFormXObject backgroundLayer = new PdfFormXObject(rectangle);
+            PdfCanvas canvas = new PdfCanvas(backgroundLayer, pdfSigner.getDocument());
             canvas.setStrokeColor(new DeviceRgb(0xF9, 0x9D, 0x25)).setLineWidth(2);
             for (int i = (int)(rectangle.getLeft() - rectangle.getHeight()); i < rectangle.getRight(); i += 5)
                 canvas.moveTo(i, rectangle.getBottom()).lineTo(i + rectangle.getHeight(), rectangle.getTop());
             canvas.stroke();
+            pdfSigner.getSignatureField().setBackgroundLayer(backgroundLayer);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -342,13 +371,12 @@ class CreateSignatureAppearance {
 
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
+            Rectangle rectangle = new Rectangle(100, 500, 300, 100);
+            pdfSigner.setPageRect(rectangle);
+            pdfSigner.setPageNumber(1);
 
-            PdfFormXObject layer2 = appearance.getLayer2();
-            Rectangle rectangle = layer2.getBBox().toRectangle();
-            PdfCanvas canvas = new PdfCanvas(layer2, pdfSigner.getDocument());
+            PdfFormXObject foregroundLayer = new PdfFormXObject(rectangle);
+            PdfCanvas canvas = new PdfCanvas(foregroundLayer, pdfSigner.getDocument());
 
             float xCenter = rectangle.getLeft() + rectangle.getWidth() / 2;
             float yCenter = rectangle.getBottom() + rectangle.getHeight() / 2;
@@ -369,6 +397,7 @@ class CreateSignatureAppearance {
 
             canvas.concatMatrix(AffineTransform.getRotateInstance(Math.atan2(rectangle.getHeight(), rectangle.getWidth()), xCenter, yCenter));
             canvas.addImageFittedIntoRectangle(badge, new Rectangle(xCenter - badgeWidth / 2, yCenter - badgeHeight + badgeWidth / 2, badgeWidth, badgeHeight), false);
+            pdfSigner.getSignatureField().setSignatureAppearanceLayer(foregroundLayer);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -387,21 +416,19 @@ class CreateSignatureAppearance {
 
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setPageRect(new Rectangle(100, 500, 300, 100));
-            appearance.setPageNumber(1);
+            Rectangle rectangle = new Rectangle(100, 500, 300, 100);
+            pdfSigner.setPageRect(rectangle);
+            pdfSigner.setPageNumber(1);
 
-            PdfFormXObject layer0 = appearance.getLayer0();
-            Rectangle rectangle = layer0.getBBox().toRectangle();
-            PdfCanvas canvas = new PdfCanvas(layer0, pdfSigner.getDocument());
+            PdfFormXObject backgroundLayer = new PdfFormXObject(rectangle);
+            PdfCanvas canvas = new PdfCanvas(backgroundLayer, pdfSigner.getDocument());
             canvas.setStrokeColor(new DeviceRgb(0xF9, 0x9D, 0x25)).setLineWidth(2);
             for (int i = (int)(rectangle.getLeft() - rectangle.getHeight()); i < rectangle.getRight(); i += 5)
                 canvas.moveTo(i, rectangle.getBottom()).lineTo(i + rectangle.getHeight(), rectangle.getTop());
             canvas.stroke();
 
-            PdfFormXObject layer2 = appearance.getLayer2();
-            rectangle = layer2.getBBox().toRectangle();
-            canvas = new PdfCanvas(layer2, pdfSigner.getDocument());
+            PdfFormXObject foregroundLayer = new PdfFormXObject(rectangle);
+            canvas = new PdfCanvas(foregroundLayer, pdfSigner.getDocument());
 
             float xCenter = rectangle.getLeft() + rectangle.getWidth() / 2;
             float yCenter = rectangle.getBottom() + rectangle.getHeight() / 2;
@@ -422,6 +449,8 @@ class CreateSignatureAppearance {
 
             canvas.concatMatrix(AffineTransform.getRotateInstance(Math.atan2(rectangle.getHeight(), rectangle.getWidth()), xCenter, yCenter));
             canvas.addImageFittedIntoRectangle(badge, new Rectangle(xCenter - badgeWidth / 2, yCenter - badgeHeight + badgeWidth / 2, badgeWidth, badgeHeight), false);
+
+            pdfSigner.getSignatureField().setBackgroundLayer(backgroundLayer).setSignatureAppearanceLayer(foregroundLayer);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -442,12 +471,10 @@ class CreateSignatureAppearance {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
             pdfSigner.setFieldName("Signature");
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setReuseAppearance(true);
+            Rectangle rectangle = pdfSigner.getSignatureField().getFirstFormAnnotation().getWidget().getRectangle().toRectangle();
 
-            PdfFormXObject layer2 = appearance.getLayer2();
-            Rectangle rectangle = layer2.getBBox().toRectangle();
-            PdfCanvas canvas = new PdfCanvas(layer2, pdfSigner.getDocument());
+            PdfFormXObject foregroundLayer = new PdfFormXObject(rectangle);
+            PdfCanvas canvas = new PdfCanvas(foregroundLayer, pdfSigner.getDocument());
 
             float xCenter = rectangle.getLeft() + rectangle.getWidth() / 2;
             float yCenter = rectangle.getBottom() + rectangle.getHeight() / 2;
@@ -469,6 +496,8 @@ class CreateSignatureAppearance {
             canvas.concatMatrix(AffineTransform.getRotateInstance(Math.atan2(rectangle.getHeight(), rectangle.getWidth()), xCenter, yCenter));
             canvas.addImageFittedIntoRectangle(badge, new Rectangle(xCenter - badgeWidth / 2, yCenter - badgeHeight + badgeWidth / 2, badgeWidth, badgeHeight), false);
 
+            pdfSigner.getSignatureField().setReuseAppearance(true).setSignatureAppearanceLayer(foregroundLayer);
+
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
         }
@@ -481,11 +510,10 @@ class CreateSignatureAppearance {
                 OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-MachineReadables.pdf")) ) {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setContact("Test content of Contact field");
-            appearance.setReason("Test content of Reason field");
-            appearance.setLocation("Test content of Location field");
-            appearance.setSignatureCreator("Test content of Signature Creator field");
+            pdfSigner.setContact("Test content of Contact field");
+            pdfSigner.setReason("Test content of Reason field");
+            pdfSigner.setLocation("Test content of Location field");
+            pdfSigner.setSignatureCreator("Test content of Signature Creator field");
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -509,13 +537,15 @@ class CreateSignatureAppearance {
             PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
             pdfSigner.setFieldName("Signature");
 
-            PdfSignatureAppearance appearance = pdfSigner.getSignatureAppearance();
-            appearance.setRenderingMode(RenderingMode.NAME_AND_DESCRIPTION);
-            appearance.setReason("Specimen");
-            appearance.setLocation("Boston");
-            appearance.setCertificate(chain[0]);
-            appearance.setLayer2FontColor(ColorConstants.LIGHT_GRAY);
-            appearance.setReuseAppearance(true);
+            pdfSigner.setReason("Specimen");
+            pdfSigner.setLocation("Boston");
+
+            pdfSigner.getSignatureField().setReuseAppearance(true);
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
+            appearance.setFontColor(ColorConstants.LIGHT_GRAY);
+            pdfSigner.setSignatureAppearance(appearance);
 
             IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
             pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
@@ -553,5 +583,63 @@ class CreateSignatureAppearance {
         canvas.showText("Test");
         canvas.endText();
         widget.setNormalAppearance(xObject.getPdfObject());
+    }
+
+    @Test
+    public void testSignInNewHierarchicalField() throws IOException, GeneralSecurityException {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        try (   InputStream resource = getClass().getResourceAsStream("/Blank.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-SignInNewHierarchicalField.pdf")) ) {
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
+            pdfSigner.setFieldName("Form.Subform.Signature");
+
+            pdfSigner.setPageRect(new Rectangle(100, 500, 300, 100));
+            pdfSigner.setPageNumber(1);
+
+            pdfSigner.setReason("Hierarchical Signature Field");
+            pdfSigner.setLocation("Boston");
+
+            IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
+            pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
+        }});
+    }
+
+    @Test
+    public void testCustomAppearance() throws IOException, GeneralSecurityException {
+        try (   InputStream badgeResource = getClass().getResourceAsStream("/iText badge.png");
+                InputStream signResource = getClass().getResourceAsStream("/johnDoe.png");
+                InputStream resource = getClass().getResourceAsStream("/Blank.pdf");
+                PdfReader pdfReader = new PdfReader(resource);
+                OutputStream result = new FileOutputStream(new File(RESULT_FOLDER, "test-CustomAppearance.pdf")) ) {
+            ImageData badge = ImageDataFactory.create(StreamUtil.inputStreamToArray(badgeResource));
+            ImageData sign = ImageDataFactory.create(StreamUtil.inputStreamToArray(signResource));
+
+            PdfSigner pdfSigner = new PdfSigner(pdfReader, result, new StampingProperties());
+
+            Rectangle rectangle = new Rectangle(100, 500, 300, 100);
+            pdfSigner.setPageRect(rectangle);
+            pdfSigner.setPageNumber(1);
+
+            Paragraph paragraph = new Paragraph();
+
+            Image signImage = new Image(sign);
+            signImage.setAutoScale(true);
+            paragraph.add(signImage);
+            Image badgeImage = new Image(badge);
+            badgeImage.setRotationAngle(- Math.PI / 16);
+            badgeImage.setAutoScale(true);
+            paragraph.add(badgeImage);
+
+            Div div = new Div();
+            div.add(paragraph);
+
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(pdfSigner.getFieldName());
+            appearance.setContent(div);
+            pdfSigner.setSignatureAppearance(appearance);
+
+            IExternalSignature pks = new PrivateKeySignature(pk, "SHA256", BouncyCastleProvider.PROVIDER_NAME);
+            pdfSigner.signDetached(new BouncyCastleDigest(), pks, chain, null, null, null, 0, CryptoStandard.CMS);
+        }
     }
 }
