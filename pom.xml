@@ -5,12 +5,12 @@
 	<artifactId>signing-examples-parent</artifactId>
 	<packaging>pom</packaging>
 	<name>Signing with iText</name>
-	<version>8.0.4</version>
+	<version>8.0.5</version>
 	<properties>
 		<bouncycastle.version>1.69</bouncycastle.version>
-		<itextpdf.version>8.0.4</itextpdf.version>
+		<itextpdf.version>8.0.5</itextpdf.version>
 		<junit.jupiter.version>5.8.2</junit.jupiter.version>
-		<logback.version>1.2.11</logback.version>
+		<logback.version>1.2.13</logback.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<slf4j.version>1.7.36</slf4j.version>
