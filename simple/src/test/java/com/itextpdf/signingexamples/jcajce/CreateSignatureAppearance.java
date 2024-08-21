@@ -50,7 +50,6 @@ import com.itextpdf.layout.properties.BackgroundImage;
 import com.itextpdf.layout.properties.BackgroundSize;
 import com.itextpdf.signatures.BouncyCastleDigest;
 import com.itextpdf.signatures.IExternalSignature;
-import com.itextpdf.signatures.PdfSignatureAppearance;
 import com.itextpdf.signatures.PdfSigner;
 import com.itextpdf.signatures.PdfSigner.CryptoStandard;
 import com.itextpdf.signatures.PrivateKeySignature;
@@ -521,7 +520,8 @@ class CreateSignatureAppearance {
     }
 
     /**
-     * This test illustrates an issue in the {@link PdfSignatureAppearance#setReuseAppearance(boolean) ReuseAppearance}
+     * This test illustrates an issue in the
+     * {@link com.itextpdf.forms.fields.PdfSignatureFormField#setReuseAppearance(boolean) ReuseAppearance}
      * feature of iText: Here the complete normal appearance of the unsigned field is re-used as n0 layer of the signed
      * field. Unfortunately it was forgotten that the original appearance was displayed so that its BBox transformed by
      * its matrix fits into the annotation rectangle. If BBox of the original appearance does not have its lower left
