@@ -119,8 +119,7 @@ class CreateSignatureAppearance {
                     .setLocation("Boston");
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance =
-                    new SignatureFieldAppearance(pdfSigner.getSignerProperties().getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent(data);
             signerProps.setSignatureAppearance(appearance);
 
@@ -146,8 +145,7 @@ class CreateSignatureAppearance {
                     .setLocation("Boston");
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance =
-                    new SignatureFieldAppearance(pdfSigner.getSignerProperties().getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent(new SignedAppearanceText(), data); // SignedAppearanceText will be filled in automatically
             signerProps.setSignatureAppearance(appearance);
 
@@ -170,7 +168,7 @@ class CreateSignatureAppearance {
                     .setLocation("Boston");
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
             signerProps.setSignatureAppearance(appearance);
 
@@ -193,7 +191,7 @@ class CreateSignatureAppearance {
             pdfSigner.setSignerProperties(signerProps);
             pdfSigner.getSignatureField().setReuseAppearance(true);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
             signerProps.setSignatureAppearance(appearance);
 
@@ -244,7 +242,7 @@ class CreateSignatureAppearance {
                     .setLocation("Boston");
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
             BackgroundSize size = new BackgroundSize();
             size.setBackgroundSizeToContain();
@@ -276,8 +274,7 @@ class CreateSignatureAppearance {
             SignedAppearanceText appearanceText = new SignedAppearanceText();
             appearanceText.setReasonLine("Objective: " + pdfSigner.getSignerProperties().getReason());
             appearanceText.setLocationLine("Whereabouts: " + pdfSigner.getSignerProperties().getLocation());
-            SignatureFieldAppearance appearance =
-                    new SignatureFieldAppearance(pdfSigner.getSignerProperties().getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent(appearanceText);
             signerProps.setSignatureAppearance(appearance);
 
@@ -300,7 +297,7 @@ class CreateSignatureAppearance {
                     .setLocation("Boston");
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
             appearance.setFont(PdfFontFactory.createFont(StandardFonts.COURIER));
             appearance.setFontColor(new DeviceRgb(0xF9, 0x9D, 0x25));
@@ -330,7 +327,7 @@ class CreateSignatureAppearance {
             signerProps.setReason(restriction);
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent(restriction, data);
             signerProps.setSignatureAppearance(appearance);
 
@@ -357,7 +354,7 @@ class CreateSignatureAppearance {
                     .setLocation("Boston");
             pdfSigner.setSignerProperties(signerProps);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent(new SignedAppearanceText(), data); // SignedAppearanceText will be filled in automatically
             signerProps.setSignatureAppearance(appearance);
 
@@ -564,7 +561,7 @@ class CreateSignatureAppearance {
 
             pdfSigner.getSignatureField().setReuseAppearance(true);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent("", new SignedAppearanceText()); // "" and SignedAppearanceText will be filled in automatically
             appearance.setFontColor(ColorConstants.LIGHT_GRAY);
             signerProps.setSignatureAppearance(appearance);
@@ -658,7 +655,7 @@ class CreateSignatureAppearance {
             Div div = new Div();
             div.add(paragraph);
 
-            SignatureFieldAppearance appearance = new SignatureFieldAppearance(signerProps.getFieldName());
+            SignatureFieldAppearance appearance = new SignatureFieldAppearance(SignerProperties.IGNORED_ID);
             appearance.setContent(div);
             signerProps.setSignatureAppearance(appearance);
 
