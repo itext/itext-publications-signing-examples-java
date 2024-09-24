@@ -5,7 +5,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.cert.CertificateException;
 
-import com.itextpdf.signatures.DigestAlgorithms;
+import com.itextpdf.kernel.crypto.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
 
 import iaik.pkcs.pkcs11.Mechanism;

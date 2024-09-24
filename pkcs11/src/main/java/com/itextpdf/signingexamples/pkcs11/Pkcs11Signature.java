@@ -1,5 +1,13 @@
 package com.itextpdf.signingexamples.pkcs11;
 
+import com.itextpdf.bouncycastleconnector.BouncyCastleFactoryCreator;
+import com.itextpdf.commons.bouncycastle.IBouncyCastleFactory;
+import com.itextpdf.commons.bouncycastle.asn1.IASN1ObjectIdentifier;
+import com.itextpdf.kernel.crypto.DigestAlgorithms;
+import com.itextpdf.signatures.IExternalSignature;
+import com.itextpdf.signatures.ISignatureMechanismParams;
+import com.itextpdf.signatures.RSASSAPSSMechanismParams;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -12,15 +20,6 @@ import java.security.cert.Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.PSSParameterSpec;
 import java.util.Enumeration;
-
-import com.itextpdf.bouncycastleconnector.BouncyCastleFactoryCreator;
-import com.itextpdf.commons.bouncycastle.IBouncyCastleFactory;
-import com.itextpdf.commons.bouncycastle.asn1.IASN1ObjectIdentifier;
-import com.itextpdf.signatures.DigestAlgorithms;
-import com.itextpdf.signatures.IExternalSignature;
-
-import com.itextpdf.signatures.ISignatureMechanismParams;
-import com.itextpdf.signatures.RSASSAPSSMechanismParams;
 import sun.security.pkcs11.SunPKCS11;
 
 /**
