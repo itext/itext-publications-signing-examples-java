@@ -16,7 +16,7 @@ import java.util.Enumeration;
 import com.itextpdf.bouncycastleconnector.BouncyCastleFactoryCreator;
 import com.itextpdf.commons.bouncycastle.IBouncyCastleFactory;
 import com.itextpdf.commons.bouncycastle.asn1.IASN1ObjectIdentifier;
-import com.itextpdf.signatures.DigestAlgorithms;
+import com.itextpdf.kernel.crypto.DigestAlgorithms;
 import com.itextpdf.signatures.IExternalSignature;
 
 import com.itextpdf.signatures.ISignatureMechanismParams;
