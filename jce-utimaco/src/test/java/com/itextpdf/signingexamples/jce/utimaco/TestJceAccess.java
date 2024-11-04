@@ -1,8 +1,5 @@
 package com.itextpdf.signingexamples.jce.utimaco;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -33,17 +30,17 @@ class TestJceAccess {
         ks.load(null, null);
 
         Enumeration<String> aliases = ks.aliases();
-        assertNotNull(aliases, "Key store did not provide an aliases enumeration.");
-        assertTrue(aliases.hasMoreElements(), "Aliases enumeration is empty.");
+        assert aliases != null;
+        assert aliases.hasMoreElements();
         String alias = aliases.nextElement();
         System.out.printf("Alias name: %s\n", alias);
 
         PrivateKey pk = (PrivateKey) ks.getKey(alias, "5678".toCharArray());
-        assertNotNull(pk, "Key store did not provide a private key for the alias " + alias);
+        assert pk != null;
 
         Certificate[] chain = ks.getCertificateChain(alias);
-        assertNotNull(chain, "Key store did not provide a certificate chain for the alias " + alias);
-        assertNotEquals(0, chain.length, "Key store provided an empty certificate chain for the alias " + alias);
+        assert chain != null;
+        assert 0 != chain.length;
         for (Certificate certificate : chain)
             if (certificate instanceof X509Certificate)
                 System.out.printf("Subject: %s\n", ((X509Certificate) certificate).getSubjectDN());

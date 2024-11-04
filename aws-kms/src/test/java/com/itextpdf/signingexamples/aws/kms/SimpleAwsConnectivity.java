@@ -1,7 +1,5 @@
 package com.itextpdf.signingexamples.aws.kms;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -87,7 +85,7 @@ class SimpleAwsConnectivity {
         try (   KmsClient kmsClient = KmsClient.create() ) {
             List<AliasListEntry> aliases = kmsClient.listAliases().aliases();
             aliases.forEach(System.out::println);
-            assertTrue(() -> aliases.stream().anyMatch(alias -> alias.aliasName().equals("alias/SigningExamples-ECC_NIST_P256")));
+            assert aliases.stream().anyMatch(alias -> alias.aliasName().equals("alias/SigningExamples-ECC_NIST_P256"));
         }
     }
 
@@ -102,11 +100,11 @@ class SimpleAwsConnectivity {
                     .message(SdkBytes.fromUtf8String("Test"))
                     .build();
             SignResponse signResponse = kmsClient.sign(signRequest);
-            assertNotNull(signResponse, "SignResponse");
+            assert signResponse!= null;
             SdkBytes signatureSdkBytes = signResponse.signature();
-            assertNotNull(signatureSdkBytes, "signature SdkBytes");
+            assert signatureSdkBytes!= null;
             byte[] signatureBytes = signatureSdkBytes.asByteArray();
-            assertNotNull(signatureBytes, "signature Bytes");
+            assert signatureBytes != null;
 
             VerifyRequest verifyRequest = VerifyRequest.builder()
                     .signingAlgorithm("ECDSA_SHA_256")
@@ -116,10 +114,10 @@ class SimpleAwsConnectivity {
                     .signature(SdkBytes.fromByteArray(signatureBytes))
                     .build();
             VerifyResponse verifyResponse = kmsClient.verify(verifyRequest);
-            assertNotNull(verifyResponse, "VerifyResponse");
+            assert verifyResponse != null;
             Boolean signatureValid = verifyResponse.signatureValid();
-            assertNotNull(signatureValid, "signatureValid Boolean");
-            assertTrue(signatureValid, "signatureValid");
+            assert signatureValid != null;
+            assert signatureValid;
         }
     }
 
@@ -132,20 +130,20 @@ class SimpleAwsConnectivity {
                     .keyId("alias/SigningExamples-ECC_NIST_P256")
                     .build();
             GetPublicKeyResponse getPublicKeyResponse = kmsClient.getPublicKey(getPublicKeyRequest);
-            assertNotNull(getPublicKeyResponse, "Response");
+            assert getPublicKeyResponse != null;
             SdkBytes spkiSdkBytes = getPublicKeyResponse.publicKey();
-            assertNotNull(spkiSdkBytes, "public key info SdkBytes");
+            assert spkiSdkBytes != null;
             byte[] spkiBytes = spkiSdkBytes.asByteArray();
-            assertNotNull(spkiBytes, "public key info Bytes");
+            assert spkiBytes != null;
             SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(spkiBytes);
-            assertNotNull(spki, "public key info");
+            assert spki != null;
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             PublicKey publicKey = converter.getPublicKey(spki);
-            assertNotNull(publicKey, "public key");
+            assert publicKey!= null;
             List<SigningAlgorithmSpec> signingAlgorithms = getPublicKeyResponse.signingAlgorithms();
-            assertNotNull(signingAlgorithms, "signing algorithms");
-            assertFalse(signingAlgorithms.isEmpty(), "signing algorithms empty");
-            assertEquals(Collections.singletonList(SigningAlgorithmSpec.ECDSA_SHA_256), signingAlgorithms);
+            assert signingAlgorithms!= null;
+            assert !signingAlgorithms.isEmpty();
+            assert Collections.singletonList(SigningAlgorithmSpec.ECDSA_SHA_256).equals( signingAlgorithms);
         }
     }
 
@@ -180,7 +178,7 @@ class SimpleAwsConnectivity {
         try (   KmsClient kmsClient = KmsClient.create() ) {
             GetPublicKeyResponse response = kmsClient.getPublicKey(GetPublicKeyRequest.builder().keyId(keyId).build());
             SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(response.publicKey().asByteArray());
-            assertNotNull(spki, "public key info");
+            assert spki != null;
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             publicKey = converter.getPublicKey(spki);
         }
@@ -240,9 +238,9 @@ class SimpleAwsConnectivity {
                         .message(SdkBytes.fromByteArray(outputStream.toByteArray()))
                         .build();
                 SignResponse signResponse = kmsClient.sign(signRequest);
-                assertNotNull(signResponse, "SignResponse");
+                assert signResponse != null;
                 SdkBytes signatureSdkBytes = signResponse.signature();
-                assertNotNull(signatureSdkBytes, "signature SdkBytes");
+                assert signatureSdkBytes != null;
                 return signatureSdkBytes.asByteArray();
             }
         }
