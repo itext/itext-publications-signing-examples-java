@@ -53,7 +53,7 @@ class TestSignSimple {
                 .withSecret(SECRET);
         String qrCodeUri = authorization.retrieveQrCodeUri();
         Desktop.getDesktop().browse(new URI(qrCodeUri));
-        authorization.pollAuthorization(2000);
+        authorization.pollAuthorization(3000);
         String cscToken = authorization.retrieveCscToken();
         CscClient client = new CscClient.Builder().withBaseUrl(Authorization.CSC_API_BASE_URL)
                 .withTrustInsecureConnections(true)
