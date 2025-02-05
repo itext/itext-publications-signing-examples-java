@@ -1,9 +1,5 @@
 package com.itextpdf.signingexamples.pkcs11.generic;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -37,17 +33,17 @@ class TestPkcs11Access {
         String config = TestEnvironment.getPkcs11Config();
 
         Provider providerPKCS11 = new SunPKCS11(config);
-        assertNotNull(providerPKCS11, "No provider generated for PKCS#11 configuration.");
+        assert providerPKCS11!= null;
         Security.addProvider(providerPKCS11);
         System.out.printf("Provider name: %s\n", providerPKCS11.getName());
 
         KeyStore ks = KeyStore.getInstance("PKCS11", providerPKCS11);
-        assertNotNull(ks, "Provider did not provide a key store.");
+        assert ks != null;
         ks.load(null, TestEnvironment.getPkcs11Pin());
 
         Enumeration<String> aliases = ks.aliases();
-        assertNotNull(aliases, "Key store did not provide an aliases enumeration.");
-        assertTrue(aliases.hasMoreElements(), "Aliases enumeration is empty.");
+        assert aliases != null;
+        assert aliases.hasMoreElements();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             System.out.printf("Alias name: %s\n", alias);
@@ -57,8 +53,8 @@ class TestPkcs11Access {
                 continue;
 
             Certificate[] chain = ks.getCertificateChain(alias);
-            assertNotNull(chain, "Key store did not provide a certificate chain for the alias " + alias);
-            assertNotEquals(0, chain.length, "Key store provided an empty certificate chain for the alias " + alias);
+            assert chain != null;
+            assert 0 != chain.length;
             for (Certificate certificate : chain)
                 if (certificate instanceof X509Certificate)
                     System.out.printf("Subject: %s\n", ((X509Certificate) certificate).getSubjectDN());

@@ -1,9 +1,5 @@
 package com.itextpdf.signingexamples.pkcs11.dtrust;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -40,8 +36,8 @@ class TestIaikPkcs11Access {
         tokenKeyStore.load(null, null);
 
         Enumeration<String> aliases = tokenKeyStore.aliases();
-        assertNotNull(aliases, "Key store did not provide an aliases enumeration.");
-        assertTrue(aliases.hasMoreElements(), "Aliases enumeration is empty.");
+        assert aliases != null;
+        assert aliases.hasMoreElements();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
             System.out.printf("Alias name: %s\n", alias);
@@ -54,8 +50,8 @@ class TestIaikPkcs11Access {
             }
 
             Certificate[] chain = tokenKeyStore.getCertificateChain(alias);
-            assertNotNull(chain, "Key store did not provide a certificate chain for the alias " + alias);
-            assertNotEquals(0, chain.length, "Key store provided an empty certificate chain for the alias " + alias);
+            assert chain != null;
+            assert 0 != chain.length;
             for (Certificate certificate : chain)
                 if (certificate instanceof X509Certificate)
                     System.out.printf("Subject: %s\n", ((X509Certificate) certificate).getSubjectDN());

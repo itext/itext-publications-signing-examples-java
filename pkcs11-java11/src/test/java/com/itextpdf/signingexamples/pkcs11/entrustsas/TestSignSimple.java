@@ -34,7 +34,7 @@ class TestSignSimple extends BaseSignSimple {
         alias = null;
         pin = (msWindowsOs ? "1234" : "5678").toCharArray();
         result = new File(RESULT_FOLDER, "circles-pkcs11-signed-simple-entrust-sas.pdf");
-        ocspClient = new OcspClientBouncyCastle(null);
+        ocspClient = new OcspClientBouncyCastle();
         tsaClient = new TSAClientBouncyCastle("http://timestamp.entrust.net/TSS/RFC3161sha2TS");
         testSignSimple();
     }

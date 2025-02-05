@@ -17,7 +17,6 @@ import java.security.spec.PSSParameterSpec;
 import java.util.Enumeration;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -110,12 +109,12 @@ class TestSignSimple {
         ks.load(null, pin);
 
         Enumeration<String> aliases = ks.aliases();
-        Assertions.assertTrue(aliases.hasMoreElements(), "No alias in CryptoServerProvider key store");
+        assert aliases.hasMoreElements();
         String alias = aliases.nextElement();
         PrivateKey pk = (PrivateKey) ks.getKey(alias, pin);
-        Assertions.assertNotNull(pk, "No key for alias");
+        assert pk != null;
         Certificate[] chain = ks.getCertificateChain(alias);
-        Assertions.assertNotNull(chain, "No chain for alias");
+        assert chain != null;
 
         IExternalSignature signature = new PrivateKeySignature(pk, "SHA256", provider.getName());
         try (   InputStream resource = getClass().getResourceAsStream("/circles.pdf");
@@ -157,12 +156,12 @@ class TestSignSimple {
         ks.load(null, pin);
 
         Enumeration<String> aliases = ks.aliases();
-        Assertions.assertTrue(aliases.hasMoreElements(), "No alias in CryptoServerProvider key store");
+        assert aliases.hasMoreElements();
         String alias = aliases.nextElement();
         PrivateKey pk = (PrivateKey) ks.getKey(alias, pin);
-        Assertions.assertNotNull(pk, "No key for alias");
+        assert pk != null;
         Certificate[] chain = ks.getCertificateChain(alias);
-        Assertions.assertNotNull(chain, "No chain for alias");
+        assert chain != null;
 
         String digestName = "SHA-256";
         IExternalSignature signature = new PrivateKeySignature(pk, digestName, "RSASSA-PSS", provider.getName(), RSASSAPSSMechanismParams.createForDigestAlgorithm(digestName)) {
