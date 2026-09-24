@@ -141,6 +141,7 @@ public class UtimacoJceSignature implements IExternalSignature {
         return sig.sign();
     }
 
+    @Override
     public ISignatureMechanismParams getSignatureMechanismParameters() {
         if (fullSignatureAlgorithmParamSpec instanceof PSSParameterSpec) {
             IBouncyCastleFactory factory = BouncyCastleFactoryCreator.getFactory();
